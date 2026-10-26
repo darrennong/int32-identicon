@@ -95,7 +95,7 @@ dependencies = [
 
 [[package]]
 name = "int32-identicon-cli"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "image",
  "int32-identicon-core",
@@ -104,7 +104,7 @@ dependencies = [
 
 [[package]]
 name = "int32-identicon-core"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "serde_json",
  "wasm-bindgen",

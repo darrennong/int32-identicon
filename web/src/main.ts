@@ -1,8 +1,11 @@
 import './style.css';
+import { version } from '../../package.json';
 import { loadWasm, type WasmApi } from './wasm-api';
 import { Consensus, type Candidate } from './consensus';
+import { guideCrop } from './capture';
 
 const el=<T extends HTMLElement>(id:string)=>document.getElementById(id) as T;
+el('app-version').textContent=version;
 const integer=el<HTMLInputElement>('integer');
 const foreground=el<HTMLSelectElement>('foreground');
 const symbol=el<HTMLDivElement>('symbol');
@@ -115,7 +118,7 @@ function showResponse(response:Response,camera:boolean,captured:number=0,id:numb
     const c=consensus.push(response.result,captured,id);
     output.value=c.confirmed?String(c.confirmed.value):'—';
     scanStatus.textContent=c.confirmed?`连续 ${c.count} 帧一致 · V1 · 前景色 ${c.confirmed.foreground}`
-      :response.result?`已识别 ${c.count}/3 帧，继续保持稳定。`:'未确认图标，请调整距离、倾角与白色留边。';
+      :response.result?`已识别 ${c.count}/3 帧，继续保持稳定。`:'未确认色卡与图案，请保持边框完整、清晰。';
   } else {
     output.value=response.result?String(response.result.value):'—';
     scanStatus.textContent=response.result?`静态图片解码成功（单帧）· V1 · 修复 ${response.result.repairedBytes} 字节`:'未找到可校验的图标。请使用白色背景、完整色卡和清晰图片。';
@@ -140,12 +143,16 @@ start.addEventListener('click',async()=>{
       if(session!==epoch||!stream)return;
       if(video.readyState>=2&&video.currentTime!==lastVideoTime) {
         lastVideoTime=video.currentTime;
-        const side=Math.min(video.videoWidth,video.videoHeight)*0.8;
+        const bounds=video.parentElement!.getBoundingClientRect();
+        const crop=guideCrop(video.videoWidth,video.videoHeight,bounds.width,bounds.height);
+        if(!crop){timer=setTimeout(capture,250);return;}
+        if(canvas.width!==crop.width)canvas.width=crop.width;
+        if(canvas.height!==crop.height)canvas.height=crop.height;
         const captured=performance.now(),id=++frame;
         lastCaptureTime=captured;
-        context.drawImage(video,(video.videoWidth-side)/2,(video.videoHeight-side)/2,side,side,0,0,640,640);
+        context.drawImage(video,crop.sx,crop.sy,crop.sw,crop.sh,0,0,crop.width,crop.height);
         try {
-          const response=await decodeImage(context.getImageData(0,0,640,640));
+          const response=await decodeImage(context.getImageData(0,0,crop.width,crop.height));
           if(session===epoch)showResponse(performance.now()-captured<=700?response:{...response,result:null},true,captured,id);
         }catch(error){if(session===epoch){stopCamera();scanStatus.textContent=String(error);}return;}
       } else if(performance.now()-lastCaptureTime>700) {

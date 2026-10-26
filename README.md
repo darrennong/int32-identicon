@@ -8,7 +8,7 @@ A reversible, screen-scannable Int32 symbol: a fixed 16-color reference frame ar
 
 <p align="center"><img src="examples/01_-1072751911.svg" width="320" alt="Real encoded Int32 identicon for -1072751911" /></p>
 
-> **初始实验版本，手机扫描尚未验收。** Rust 编解码、真实样例和静态图像识别已实现；浏览器具备 WASM、Worker、图片导入和摄像头三帧确认。自动定位要求单个图标、清洁的浅色背景和完整白色留边。iPhone Safari / Android Chrome 的真实屏幕扫描成功率、误接受与延迟，仍需按[实机矩阵](docs/VALIDATION.md)测量。
+> **实验版本 0.1.1，手机连续扫描尚未验收。** Rust 编解码、真实样例和静态图像识别已实现；浏览器具备 WASM、Worker、图片导入和摄像头三帧确认。0.1.1 改用多色边框定位，可在周围有屏幕文字和灰色界面的画面中寻找图标；一张用户提供的手机相机预览截图已从像素解出 `123456789`。完整色卡和白色留边仍需清晰；真实屏幕扫描成功率、误接受与延迟，仍需按[实机矩阵](docs/VALIDATION.md)测量。
 
 ## 图像与容量
 

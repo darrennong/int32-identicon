@@ -6,8 +6,9 @@ export interface WasmApi {
 let instance: Promise<WasmApi> | undefined;
 export function loadWasm(): Promise<WasmApi> {
   return instance ??= (async()=>{
-    const url=`${import.meta.env.BASE_URL}wasm/int32_identicon_core.js`;
+    const url=`${import.meta.env.BASE_URL}wasm/int32_identicon_core.js?v=${version}`;
     const api=await import(/* @vite-ignore */ url) as WasmApi;
-    await api.default();return api;
+    await api.default({module_or_path:`${import.meta.env.BASE_URL}wasm/int32_identicon_core_bg.wasm?v=${version}`});return api;
   })();
 }
+import { version } from '../../package.json';

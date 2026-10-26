@@ -45,12 +45,25 @@ No physical camera was used in these browser checks. Mobile compatibility and re
 
 ## Limits
 
-- Automatic location requires one symbol with a clean light surround. The extreme-point locator can reject clutter, multiple symbols, large rotation and hidden borders. It is not a general scene detector.
+- Since 0.1.1, automatic location uses multicolored frame components and extends their four long outer sides; it no longer requires the entire camera crop to be white. Components are connected across narrow neutral seams, but hull geometry uses original chromatic pixels. The former whole-image dark-pixel bounds remain a proposal for clean generated images only. This is still not a general scene detector: hidden borders, heavy clutter, very small symbols and severe blur can fail.
+- At most 12 multihue components are processed. Scenes exceeding this bounded search budget reject with a quality error; extra candidates are never silently discarded in favor of a first hit. Every proposed quad must still pass the full border, mirror, ECC, version and CRC checks. Distinct valid symbols in one image are rejected as ambiguous.
 - Color reference uses per-channel black/white normalization, expected border checks and binary foreground classification. General camera color matrices, severe clipping, reflection and moiré are not yet modeled.
 - Nine inset samples per cell reduce noise; they cannot recover data destroyed by defocus or motion blur.
 - RS guarantees apply only within the byte correction budget. CRC-16 is not authentication or proof of zero false accepts.
 - Static image import is single-frame; camera output requires temporal consensus. Physical mobile browser behavior remains unverified.
 - No backend, video upload, analytics or offline service worker. The demo requires its GitHub Pages workflow to finish.
+
+## 0.1.1 camera-preview screenshot regression
+
+A user reported an active phone camera preview with a visible symbol but no result. The former locator used all nonwhite pixels in the frame, so surrounding desktop text and window edges displaced the proposed corners. Giving the correct four corners to the unchanged sampler already decoded `123456789`, foreground 15, with zero repaired bytes. This isolated the failure to localization.
+
+The 0.1.1 multicolor locator automatically recovers that integer from the complete supplied JPEG, without supplying corners, cropping to the symbol or reading its printed label. This is **one still screenshot**, not proof of a continuous three-frame phone scan or a success-rate measurement. The source screenshot and derived pixels stay local and are not committed to this public repository.
+
+Committed deterministic regressions use neutral synthetic screen scenes with dark text-like strokes, gray window chrome, a blue icon, a 192-pixel symbol, rotations -28/-8/0/17/36/90 degrees, four foregrounds, brightness lift, noise and blur. Additional tests reject damaged payloads, 48 pseudorandom negative frames, and two different valid symbols in one image. A negative count of 48 is finite test coverage, not a zero-false-accept claim.
+
+The camera now maps the actual CSS guide through `object-fit: cover` into source pixels, preserving rectangular previews after a height constraint or device rotation. Square, short landscape, portrait and invalid-layout cases have unit coverage. Result/status are placed immediately below the preview on mobile; the footer identifies scanner 0.1.1. The V1 wire format, palette, CRC, ECC and example images are unchanged.
+
+The loader versions both its JavaScript-module URL and its WASM-binary URL with the application version, so an ordinary reload after deployment can retrieve the changed core even when the previous public filenames remain in HTTP cache.
 
 ## Physical matrix — NOT RUN
 

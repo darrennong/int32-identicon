@@ -39,12 +39,14 @@
           <p class="intro">让单个图标和白色留边完整进入取景框。优先使用另一块屏幕显示的图标。</p>
           <div class="actions"><button id="camera-start" class="primary">开启摄像头</button><button id="camera-stop" disabled>停止</button></div>
           <label for="image-file" class="upload-label">或选择 PNG / JPEG 图片 ↓</label><input id="image-file" type="file" accept="image/png,image/jpeg" />
-          <div class="readout"><span class="eyebrow">识别结果</span><output id="scan-result">—</output><p id="scan-status" role="status">摄像头连续 3 帧一致后才输出。</p><span id="timing" class="hint"></span></div>
           <p class="hint">画面仅在本机 Worker 中处理。当前为扫描原型，手机实测验收尚未完成。</p>
         </div>
-        <div class="camera-view"><video id="camera" playsinline muted autoplay></video><div class="guide" aria-hidden="true"></div><div id="camera-placeholder"><span>＋</span><p>屏幕扫描实验</p><small>HTTPS · Safari / Chrome</small></div></div>
+        <div class="scan-visual">
+          <div class="camera-view"><video id="camera" playsinline muted autoplay></video><div class="guide" aria-hidden="true"></div><div id="camera-placeholder"><span>＋</span><p>屏幕扫描实验</p><small>HTTPS · Safari / Chrome</small></div></div>
+          <div class="readout"><span class="eyebrow">识别结果</span><output id="scan-result">—</output><p id="scan-status" role="status">摄像头连续 3 帧一致后才输出。</p><span id="timing" class="hint"></span></div>
+        </div>
       </section>
-      <footer><span>32 bit 数据 · CRC-16 · RS(9,7)</span><span>MIT 开源 / 浏览器本地处理</span></footer>
+      <footer><span>32 bit 数据 · CRC-16 · RS(9,7)</span><span>扫描器 <span id="app-version"></span> · MIT 开源 / 浏览器本地处理</span></footer>
     </main>
     <script type="module" src="/src/main.ts"></script>
   </body>

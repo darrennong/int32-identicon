@@ -1,5 +1,5 @@
-//! Conservative single-symbol scanner. Automatic localization currently requires
-//! a clean light surround. Explicit quadrilaterals support projective sampling.
+//! Color-frame candidate location, projective sampling, and conservative
+//! validation across every located symbol and every D4 orientation.
 use crate::{decode, grid, Decoded, Error, FOREGROUNDS, MASK, PALETTE};
 
 pub type Point = [f64; 2];
@@ -164,9 +164,8 @@ fn pixel(rgba: &[u8], offset: usize) -> Color {
     std::array::from_fn(|ch| rgba[offset + ch] as f64 * a + 255.0 * (1.0 - a))
 }
 
-/// A light-background locator; clutter is deliberately rejected by validation.
-/// In a camera frame, crop to the on-screen guide and include the quiet zone.
-pub fn locate(width: usize, height: usize, rgba: &[u8]) -> Result<Quad, Error> {
+/// Legacy clean-background proposal, also useful for exact generated images.
+fn light_quad(width: usize, height: usize, rgba: &[u8]) -> Result<Quad, Error> {
     validate_image(width, height, rgba)?;
     let mut corners = [[0.0; 2]; 4];
     let mut scores = [f64::INFINITY; 4];
@@ -293,6 +292,38 @@ pub fn decode_quad(width: usize, height: usize, rgba: &[u8], quad: Quad) -> Resu
 }
 
 pub fn decode_image(width: usize, height: usize, rgba: &[u8]) -> Result<Decoded, Error> {
-    let quad = locate(width, height, rgba)?;
-    decode_quad(width, height, rgba, quad)
+    detect(width, height, rgba).map(|(decoded, _)| decoded)
+}
+
+/// Return the geometry of a uniquely validated payload, never the bounds of all
+/// dark text or window chrome in a frame.
+pub fn locate(width: usize, height: usize, rgba: &[u8]) -> Result<Quad, Error> {
+    detect(width, height, rgba).map(|(_, quad)| quad)
+}
+
+fn detect(width: usize, height: usize, rgba: &[u8]) -> Result<(Decoded, Quad), Error> {
+    validate_image(width, height, rgba)?;
+    let mut candidates = crate::locator::candidates(width, height, rgba)?;
+    if let Ok(quad) = light_quad(width, height, rgba) {
+        candidates.push(quad);
+    }
+    let mut accepted: Option<(Decoded, Quad)> = None;
+    for quad in candidates {
+        match decode_quad(width, height, rgba, quad) {
+            Ok(result) => {
+                if let Some((previous, _)) = accepted {
+                    if previous.value != result.value || previous.foreground != result.foreground {
+                        return Err(Error::Ambiguous);
+                    }
+                    if previous.repaired_bytes <= result.repaired_bytes {
+                        continue;
+                    }
+                }
+                accepted = Some((result, quad));
+            }
+            Err(Error::Ambiguous) => return Err(Error::Ambiguous),
+            Err(_) => (),
+        }
+    }
+    accepted.ok_or(Error::NotFound)
 }

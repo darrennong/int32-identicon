@@ -1,5 +1,6 @@
 //! Int32 Identicon protocol V1. See docs/PROTOCOL-V1.md for the wire contract.
 mod ecc;
+mod locator;
 pub mod scan;
 #[cfg(target_arch = "wasm32")]
 mod wasm;
