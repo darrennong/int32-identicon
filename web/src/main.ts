@@ -79,11 +79,12 @@ function imagePixels(image:HTMLImageElement,maxSize=1024):ImageData {
 }
 el('download-svg').addEventListener('click',()=>download(new Blob([currentSvg],{type:'image/svg+xml'}),`int32-${currentValue}.svg`));
 el('download-png').addEventListener('click',async()=>{
+  const value=currentValue,svg=currentSvg;
   try {
-    const image=await loadImage(new Blob([currentSvg],{type:'image/svg+xml'}));
+    const image=await loadImage(new Blob([svg],{type:'image/svg+xml'}));
     const canvas=document.createElement('canvas');canvas.width=640;canvas.height=640;
     const context=canvas.getContext('2d')!;context.imageSmoothingEnabled=false;context.drawImage(image,0,0,640,640);
-    canvas.toBlob(blob=>{if(blob)download(blob,`int32-${currentValue}.png`);},'image/png');
+    canvas.toBlob(blob=>{if(blob)download(blob,`int32-${value}.png`);},'image/png');
   }catch(error){genStatus.textContent=String(error);}
 });
 el('self-check').addEventListener('click',async()=>{
@@ -171,7 +172,7 @@ el<HTMLInputElement>('image-file').addEventListener('change',async(event)=>{
   }catch(error){if(session===epoch)scanStatus.textContent=String(error);}
 });
 function selectTab(name:'generate'|'scan') {
-  if(name==='generate'&&stream)stopCamera();
+  if(name==='generate')stopCamera();
   for(const id of ['generate','scan']) {
     el(id).hidden=id!==name;
     el(`${id}-tab`).setAttribute('aria-selected',String(id===name));
@@ -186,7 +187,7 @@ for(const name of ['generate','scan'] as const) {
     }
   });
 }
-document.addEventListener('visibilitychange',()=>{if(document.hidden&&stream){stopCamera();scanStatus.textContent='页面离开前台，摄像头已停止。';}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){stopCamera();scanStatus.textContent='页面离开前台，摄像头已停止。';}});
 window.addEventListener('pagehide',()=>stopCamera());
 selectTab('generate');
 loadWasm().then(loaded=>{api=loaded;update();}).catch(()=>{genStatus.textContent='WASM 加载失败，请检查网络后刷新。';});

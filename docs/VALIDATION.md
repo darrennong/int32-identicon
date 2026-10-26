@@ -29,6 +29,20 @@ npm test
 
 The Node/WASM test prints execution time for ten decodes as a development observation only. It is not a mobile performance benchmark.
 
+## Hosted desktop browser checks
+
+The first source commit `05835319f8b023b4a761b1829aabcd4bbe6a36f6` passed [Linux CI](https://github.com/darrennong/int32-identicon/actions/runs/40371746738) and [Pages deployment](https://github.com/darrennong/int32-identicon/actions/runs/40371747386).
+
+On the HTTPS demo in desktop Chrome, the initial check executed:
+
+- Int32 minimum and maximum generated and decoded from SVG-rasterized pixels through the real Worker/WASM path.
+- Explicit blue foreground generated and decoded.
+- Input `2147483648` rejected, export and self-check buttons disabled.
+- Actual `01_-1072751911.png` selected through the file picker; result `-1072751911`, zero repaired bytes, explicitly marked single-frame.
+- At a 390 CSS-pixel emulated viewport, the generator computed a single-column layout with no horizontal overflow. This is a layout check, **not a physical mobile browser test**.
+
+No physical camera was used in these browser checks. Mobile compatibility and real screen capture remain pending.
+
 ## Limits
 
 - Automatic location requires one symbol with a clean light surround. The extreme-point locator can reject clutter, multiple symbols, large rotation and hidden borders. It is not a general scene detector.

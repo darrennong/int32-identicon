@@ -13,6 +13,8 @@
 
 ## 下一批任务
 
+GitHub 跟踪：[真实图片识别 #1](https://github.com/darrennong/int32-identicon/issues/1) · [手机浏览器兼容 #2](https://github.com/darrennong/int32-identicon/issues/2) · [实机与性能 #3](https://github.com/darrennong/int32-identicon/issues/3)。
+
 1. 用真实 iPhone / Android 手机扫描电脑和另一台手机屏幕，保留不含私人背景的授权测试裁图。
 2. 根据失败样本改进定位。当前使用浅色背景上的非白像素极值，不能应付任意复杂画面。显式四角 API 可区分定位问题与采样问题。
 3. 测量色偏、过曝、PWM / 摩尔纹、模糊与反光，调整质量阈值。拒绝优先于猜测。
