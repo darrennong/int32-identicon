@@ -1,0 +1,111 @@
+{
+  "protocol": 1,
+  "crcCheck": "29B1",
+  "vectors": [
+    {
+      "value": -2147483648,
+      "foreground": 4,
+      "crcHex": "4168",
+      "codewordHex": "14800000004168833E",
+      "maskedHex": "B1BC96F0691BAB0420"
+    },
+    {
+      "value": 2147483647,
+      "foreground": 1,
+      "crcHex": "FBF0",
+      "codewordHex": "117FFFFFFFFBF069F3",
+      "maskedHex": "B443690F96A133EEED"
+    },
+    {
+      "value": -1,
+      "foreground": 8,
+      "crcHex": "8EB4",
+      "codewordHex": "18FFFFFFFF8EB4D6F4",
+      "maskedHex": "BDC3690F96D47751EA"
+    },
+    {
+      "value": 0,
+      "foreground": 0,
+      "crcHex": "1556",
+      "codewordHex": "10000000001556DA89",
+      "maskedHex": "B53C96F0694F955D97"
+    },
+    {
+      "value": 1,
+      "foreground": 1,
+      "crcHex": "AF26",
+      "codewordHex": "1100000001AF26BB22",
+      "maskedHex": "B43C96F068F5E53C3C"
+    },
+    {
+      "value": -1072751911,
+      "foreground": 13,
+      "crcHex": "1D55",
+      "codewordHex": "1DC00F1AD91D556F36",
+      "maskedHex": "B8FC99EAB04796E828"
+    },
+    {
+      "value": 1238451475,
+      "foreground": 9,
+      "crcHex": "A20E",
+      "codewordHex": "1949D14513A20E265D",
+      "maskedHex": "BC7547B57AF8CDA143"
+    },
+    {
+      "value": 1326555370,
+      "foreground": 1,
+      "crcHex": "303C",
+      "codewordHex": "114F11A0EA303CD2DB",
+      "maskedHex": "B4738750836AFF55C5"
+    },
+    {
+      "value": 446132460,
+      "foreground": 8,
+      "crcHex": "AD25",
+      "codewordHex": "181A9770ECAD25C140",
+      "maskedHex": "BD26018085F7E6465E"
+    },
+    {
+      "value": 1708908425,
+      "foreground": 15,
+      "crcHex": "05E5",
+      "codewordHex": "1F65DBDF8905E5C7D0",
+      "maskedHex": "BA594D2FE05F2640CE"
+    },
+    {
+      "value": -613096676,
+      "foreground": 12,
+      "crcHex": "BAF5",
+      "codewordHex": "1CDB74E31CBAF51B18",
+      "maskedHex": "B9E7E21375E0369C06"
+    },
+    {
+      "value": -1509993865,
+      "foreground": 8,
+      "crcHex": "E886",
+      "codewordHex": "18A5FF5277E886575E",
+      "maskedHex": "BD9969A21EB245D040"
+    },
+    {
+      "value": -1182588849,
+      "foreground": 9,
+      "crcHex": "624B",
+      "codewordHex": "19B983204F624B1A7F",
+      "maskedHex": "BC8515D02638889D61"
+    },
+    {
+      "value": 1826586570,
+      "foreground": 8,
+      "crcHex": "285F",
+      "codewordHex": "186CDF7FCA285F462F",
+      "maskedHex": "BD50498FA3729CC131"
+    },
+    {
+      "value": -404114055,
+      "foreground": 14,
+      "crcHex": "3FDF",
+      "codewordHex": "1EE7E9B5793FDFEED2",
+      "maskedHex": "BBDB7F4510651C69CC"
+    }
+  ]
+}

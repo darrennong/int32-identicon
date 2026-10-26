@@ -1,0 +1,14 @@
+[package]
+name = "int32-identicon-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "identicon"
+path = "src/main.rs"
+
+[dependencies]
+int32-identicon-core = { path = "../core" }
+image = { version = "0.24.9", default-features = false, features = ["png", "jpeg"] }
+serde_json = "1.0"

@@ -1,0 +1,16 @@
+[package]
+name = "int32-identicon-core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Reversible Int32 identicons with a color reference frame"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "=0.2.129"
+
+[dev-dependencies]
+serde_json = "1.0"

@@ -1,0 +1,106 @@
+{
+  "examples": [
+    {
+      "codewordHex": "1DC00F1AD91D556F36",
+      "crcHex": "1D55",
+      "decodedFromPng": -1072751911,
+      "foreground": 13,
+      "maskedHex": "B8FC99EAB04796E828",
+      "png": "01_-1072751911.png",
+      "svg": "01_-1072751911.svg",
+      "value": -1072751911
+    },
+    {
+      "codewordHex": "1949D14513A20E265D",
+      "crcHex": "A20E",
+      "decodedFromPng": 1238451475,
+      "foreground": 9,
+      "maskedHex": "BC7547B57AF8CDA143",
+      "png": "02_1238451475.png",
+      "svg": "02_1238451475.svg",
+      "value": 1238451475
+    },
+    {
+      "codewordHex": "114F11A0EA303CD2DB",
+      "crcHex": "303C",
+      "decodedFromPng": 1326555370,
+      "foreground": 1,
+      "maskedHex": "B4738750836AFF55C5",
+      "png": "03_1326555370.png",
+      "svg": "03_1326555370.svg",
+      "value": 1326555370
+    },
+    {
+      "codewordHex": "181A9770ECAD25C140",
+      "crcHex": "AD25",
+      "decodedFromPng": 446132460,
+      "foreground": 8,
+      "maskedHex": "BD26018085F7E6465E",
+      "png": "04_446132460.png",
+      "svg": "04_446132460.svg",
+      "value": 446132460
+    },
+    {
+      "codewordHex": "1F65DBDF8905E5C7D0",
+      "crcHex": "05E5",
+      "decodedFromPng": 1708908425,
+      "foreground": 15,
+      "maskedHex": "BA594D2FE05F2640CE",
+      "png": "05_1708908425.png",
+      "svg": "05_1708908425.svg",
+      "value": 1708908425
+    },
+    {
+      "codewordHex": "1CDB74E31CBAF51B18",
+      "crcHex": "BAF5",
+      "decodedFromPng": -613096676,
+      "foreground": 12,
+      "maskedHex": "B9E7E21375E0369C06",
+      "png": "06_-613096676.png",
+      "svg": "06_-613096676.svg",
+      "value": -613096676
+    },
+    {
+      "codewordHex": "18A5FF5277E886575E",
+      "crcHex": "E886",
+      "decodedFromPng": -1509993865,
+      "foreground": 8,
+      "maskedHex": "BD9969A21EB245D040",
+      "png": "07_-1509993865.png",
+      "svg": "07_-1509993865.svg",
+      "value": -1509993865
+    },
+    {
+      "codewordHex": "19B983204F624B1A7F",
+      "crcHex": "624B",
+      "decodedFromPng": -1182588849,
+      "foreground": 9,
+      "maskedHex": "BC8515D02638889D61",
+      "png": "08_-1182588849.png",
+      "svg": "08_-1182588849.svg",
+      "value": -1182588849
+    },
+    {
+      "codewordHex": "186CDF7FCA285F462F",
+      "crcHex": "285F",
+      "decodedFromPng": 1826586570,
+      "foreground": 8,
+      "maskedHex": "BD50498FA3729CC131",
+      "png": "09_1826586570.png",
+      "svg": "09_1826586570.svg",
+      "value": 1826586570
+    },
+    {
+      "codewordHex": "1EE7E9B5793FDFEED2",
+      "crcHex": "3FDF",
+      "decodedFromPng": -404114055,
+      "foreground": 14,
+      "maskedHex": "BBDB7F4510651C69CC",
+      "png": "10_-404114055.png",
+      "svg": "10_-404114055.svg",
+      "value": -404114055
+    }
+  ],
+  "protocol": 1,
+  "seedHex": "49333244"
+}

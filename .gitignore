@@ -1,0 +1,10 @@
+/target/
+/.tools/
+/node_modules/
+/web/dist/
+/web/public/wasm/
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
