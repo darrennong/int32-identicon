@@ -8,6 +8,7 @@ const el=<T extends HTMLElement>(id:string)=>document.getElementById(id) as T;
 el('app-version').textContent=version;
 const integer=el<HTMLInputElement>('integer');
 const foreground=el<HTMLSelectElement>('foreground');
+const imageSize=el<HTMLInputElement>('image-size');
 const symbol=el<HTMLDivElement>('symbol');
 const genStatus=el<HTMLParagraphElement>('generate-status');
 const scanStatus=el<HTMLParagraphElement>('scan-status');
@@ -34,8 +35,7 @@ function decodeImage(data:ImageData):Promise<Response> {
 }
 
 let api:WasmApi;
-let currentSvg='';
-let currentValue=123456789;
+let currentImage:{value:number;size:number;svg:string}|null=null;
 let stream:MediaStream|null=null;
 let timer:ReturnType<typeof setTimeout>|undefined;
 let epoch=0;
@@ -49,17 +49,24 @@ function parseInteger():number|null {
 function update() {
   if(!api)return;
   const v=parseInteger();
+  const size=imageSize.valueAsNumber;
+  const validSize=imageSize.validity.valid;
   integer.setAttribute('aria-invalid',String(v===null));
-  buttons.forEach(b=>b.disabled=v===null);
+  imageSize.setAttribute('aria-invalid',String(!validSize));
+  buttons.forEach(b=>b.disabled=v===null||!validSize);
+  currentImage=null;
   if(v===null){genStatus.textContent='请输入范围内的整数。';return;}
-  currentValue=v;
-  currentSvg=api.encode_svg(v,Number(foreground.value));
-  symbol.innerHTML=currentSvg;
+  if(!validSize){genStatus.textContent=`请输入 ${imageSize.min} 到 ${imageSize.max} 之间的整数边长。`;return;}
+  const svg=api.encode_svg_with_size(v,Number(foreground.value),size);
+  currentImage={value:v,size,svg};
+  symbol.innerHTML=svg;
+  symbol.style.width=`${size}px`;
   el('value-caption').textContent=String(v);
   genStatus.textContent='图标已生成，可下载或在另一块屏幕上扫描。';
 }
 integer.addEventListener('input',update);
 foreground.addEventListener('change',update);
+imageSize.addEventListener('input',update);
 el('random').addEventListener('click',()=>{integer.value=String(crypto.getRandomValues(new Int32Array(1))[0]);update();});
 
 function download(blob:Blob,name:string) {
@@ -80,27 +87,35 @@ function imagePixels(image:HTMLImageElement,maxSize=1024):ImageData {
   context.drawImage(image,0,0,canvas.width,canvas.height);
   return context.getImageData(0,0,canvas.width,canvas.height);
 }
-el('download-svg').addEventListener('click',()=>download(new Blob([currentSvg],{type:'image/svg+xml'}),`int32-${currentValue}.svg`));
+el('download-svg').addEventListener('click',()=>{
+  if(!currentImage)return;
+  const {value,svg}=currentImage;
+  download(new Blob([svg],{type:'image/svg+xml'}),`int32-${value}.svg`);
+});
 el('download-png').addEventListener('click',async()=>{
-  const value=currentValue,svg=currentSvg;
+  const selection=currentImage;
+  if(!selection)return;
+  const {value,size,svg}=selection;
   try {
     const image=await loadImage(new Blob([svg],{type:'image/svg+xml'}));
-    const canvas=document.createElement('canvas');canvas.width=640;canvas.height=640;
-    const context=canvas.getContext('2d')!;context.imageSmoothingEnabled=false;context.drawImage(image,0,0,640,640);
+    const canvas=document.createElement('canvas');canvas.width=size;canvas.height=size;
+    const context=canvas.getContext('2d')!;context.imageSmoothingEnabled=false;context.drawImage(image,0,0,size,size);
     canvas.toBlob(blob=>{if(blob)download(blob,`int32-${value}.png`);},'image/png');
-  }catch(error){genStatus.textContent=String(error);}
+  }catch(error){if(currentImage===selection)genStatus.textContent=String(error);}
 });
 el('self-check').addEventListener('click',async()=>{
-  const value=currentValue;
+  const selection=currentImage;
+  if(!selection)return;
+  const {value,svg}=selection;
   genStatus.textContent='正在从渲染后的像素解码…';
   try {
-    const image=await loadImage(new Blob([currentSvg],{type:'image/svg+xml'}));
+    const image=await loadImage(new Blob([svg],{type:'image/svg+xml'}));
     const response=await decodeImage(imagePixels(image));
-    if(parseInteger()!==value)return;
+    if(currentImage!==selection)return;
     genStatus.textContent=response.result?.value===value
       ?`像素解码通过：${response.result.value} · ${response.elapsed.toFixed(1)} ms`
       :'未能从当前图标解码。';
-  }catch(error){genStatus.textContent=String(error);}
+  }catch(error){if(currentImage===selection)genStatus.textContent=String(error);}
 });
 
 function stopCamera() {

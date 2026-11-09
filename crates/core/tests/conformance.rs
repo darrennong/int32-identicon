@@ -160,6 +160,64 @@ fn png_equivalent_pixels_and_input_guards() {
 }
 
 #[test]
+fn custom_image_side_preserves_grid_and_quiet_zone() {
+    let value = -123456789;
+    let foreground = Some(12);
+    let default_svg = core::svg(value, foreground).unwrap();
+    assert!(default_svg.contains("width=\"640\" height=\"640\""));
+    assert_eq!(
+        core::svg_with_size(value, foreground, 127).unwrap(),
+        default_svg.replace(
+            "width=\"640\" height=\"640\"",
+            "width=\"127\" height=\"127\""
+        )
+    );
+
+    let grid = core::grid(value, foreground).unwrap();
+    for requested in [core::MIN_IMAGE_SIZE, 127] {
+        let (size, pixels) = core::rgba_with_size(value, foreground, requested).unwrap();
+        assert_eq!(size, requested);
+        assert_eq!(pixels.len(), size * size * 4);
+        for y in 0..20 {
+            for x in 0..20 {
+                let index = if (2..18).contains(&x) && (2..18).contains(&y) {
+                    grid[y - 2][x - 2]
+                } else {
+                    3
+                };
+                let [r, g, b] = core::PALETTE[index as usize];
+                let center_x = (2 * x + 1) * size / 40;
+                let center_y = (2 * y + 1) * size / 40;
+                let offset = (center_y * size + center_x) * 4;
+                assert_eq!(pixels[offset..offset + 4], [r, g, b, 255]);
+            }
+        }
+        if size == 127 {
+            assert_eq!(
+                scan::decode_image(size, size, &pixels).unwrap().value,
+                value
+            );
+        }
+    }
+
+    for invalid in [
+        0,
+        core::MIN_IMAGE_SIZE - 1,
+        core::MAX_IMAGE_SIZE + 1,
+        usize::MAX,
+    ] {
+        assert_eq!(
+            core::svg_with_size(value, foreground, invalid),
+            Err(core::Error::Image)
+        );
+        assert_eq!(
+            core::rgba_with_size(value, foreground, invalid),
+            Err(core::Error::Image)
+        );
+    }
+}
+
+#[test]
 fn perspective_gain_offset_and_noise() {
     let grid = core::grid(-901234567, Some(13)).unwrap();
     let (w, h) = (480, 400);

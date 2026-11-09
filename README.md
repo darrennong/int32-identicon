@@ -43,6 +43,23 @@ npm run dev
 
 在一块屏幕打开生成页，在另一台手机打开扫描页，让一个图标及白色留边进入取景框。浏览器不上传图像、不接入分析服务、不加载外部 CDN。静态图片结果注明单帧；摄像头要求 3 个不同、连续且及时的帧一致；不确定、校验失败或多个不同有效结果都不会输出整数。
 
+### 手动指定尺寸
+
+网页生成器的「图像边长」同时控制 SVG 和 PNG 的导出尺寸。命令行可以用 `--size` 指定边长，单位为像素，默认 `640`，支持 `20–2560` 的整数。
+
+```sh
+cargo run -p int32-identicon-cli -- encode 123456789 example.svg --size 180
+cargo run -p int32-identicon-cli -- encode 123456789 example.png 12 --size 321
+```
+
+引用已生成的 SVG 时，可以在 HTML 中给同一张图指定不同的显示边长。宽高设为同一数值即可等比缩放，包括白色留边。
+
+```html
+<img src="./example.svg" width="180" height="180" alt="Int32 图标 123456789">
+```
+
+程序调用可使用 Rust 的 `svg_with_size(value, foreground, size)` 或 `rgba_with_size(value, foreground, size)`，也可在初始化 WebAssembly 后调用 `encode_svg_with_size(123456789, -1, 180)`，其中 `-1` 代表自动选择前景色。
+
 ## 目录与状态
 
 | 目录 | 内容 |

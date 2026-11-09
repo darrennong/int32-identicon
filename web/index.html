@@ -26,6 +26,9 @@
           <p id="integer-help" class="hint">−2,147,483,648 到 2,147,483,647</p>
           <label for="foreground">前景色</label>
           <select id="foreground"><option value="-1">由整数自动选择</option><option value="0">黑色</option><option value="1">深灰</option><option value="4">红色</option><option value="8">绿色</option><option value="9">青绿色</option><option value="12">蓝色</option><option value="13">紫色</option><option value="14">洋红色</option><option value="15">棕色</option></select>
+          <label for="image-size" class="size-label">图像边长（像素）</label>
+          <input id="image-size" type="number" inputmode="numeric" value="640" min="20" max="2560" step="1" required aria-describedby="size-help" />
+          <p id="size-help" class="hint">SVG 和 PNG 均按所填边长导出。预览会随窗口缩小。</p>
           <div class="actions"><button id="download-svg" class="primary" disabled>下载 SVG ↓</button><button id="download-png" disabled>PNG ↓</button></div>
           <button id="self-check" class="text-button" disabled>解码当前图标 ↗</button>
           <p id="generate-status" role="status" class="status">正在加载 Rust / WASM…</p>

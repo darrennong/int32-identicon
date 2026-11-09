@@ -8,6 +8,11 @@ mod wasm;
 use std::fmt;
 
 pub const VERSION: u8 = 1;
+pub const DEFAULT_IMAGE_SIZE: usize = 640;
+pub const MIN_IMAGE_SIZE: usize = 20;
+pub const MAX_IMAGE_SIZE: usize = 2560;
+const IMAGE_CELLS: usize = 20;
+const QUIET_ZONE_CELLS: usize = 2;
 pub const PALETTE: [[u8; 3]; 16] = [
     [0x00, 0x00, 0x00],
     [0x4b, 0x55, 0x63],
@@ -139,10 +144,18 @@ pub fn grid(value: i32, foreground: Option<u8>) -> Result<Grid, Error> {
     Ok(result)
 }
 
-/// Two white quiet-zone cells are outside the logical 16x16 symbol.
+/// Render SVG with the default pixel dimensions.
 pub fn svg(value: i32, foreground: Option<u8>) -> Result<String, Error> {
+    svg_with_size(value, foreground, DEFAULT_IMAGE_SIZE)
+}
+
+/// Render a square SVG with a pixel side length including two white quiet-zone cells.
+pub fn svg_with_size(value: i32, foreground: Option<u8>, size: usize) -> Result<String, Error> {
+    if !(MIN_IMAGE_SIZE..=MAX_IMAGE_SIZE).contains(&size) {
+        return Err(Error::Image);
+    }
     let cells = grid(value, foreground)?;
-    let mut result = String::from("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 20 20\" width=\"640\" height=\"640\" shape-rendering=\"crispEdges\" role=\"img\" aria-label=\"Int32 identicon\"><rect width=\"20\" height=\"20\" fill=\"white\"/>");
+    let mut result = format!("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 {IMAGE_CELLS} {IMAGE_CELLS}\" width=\"{size}\" height=\"{size}\" shape-rendering=\"crispEdges\" role=\"img\" aria-label=\"Int32 identicon\"><rect width=\"{IMAGE_CELLS}\" height=\"{IMAGE_CELLS}\" fill=\"white\"/>");
     for (y, row) in cells.iter().enumerate() {
         for (x, &index) in row.iter().enumerate() {
             if index == 3 {
@@ -151,8 +164,8 @@ pub fn svg(value: i32, foreground: Option<u8>) -> Result<String, Error> {
             let c = PALETTE[index as usize];
             result.push_str(&format!(
                 "<rect x=\"{}\" y=\"{}\" width=\"1\" height=\"1\" fill=\"#{:02X}{:02X}{:02X}\"/>",
-                x + 2,
-                y + 2,
+                x + QUIET_ZONE_CELLS,
+                y + QUIET_ZONE_CELLS,
                 c[0],
                 c[1],
                 c[2]
@@ -169,19 +182,39 @@ pub fn rgba(
     foreground: Option<u8>,
     cell_size: usize,
 ) -> Result<(usize, Vec<u8>), Error> {
-    if !(1..=128).contains(&cell_size) {
+    if !(1..=MAX_IMAGE_SIZE / IMAGE_CELLS).contains(&cell_size) {
+        return Err(Error::Image);
+    }
+    rgba_with_size(value, foreground, IMAGE_CELLS * cell_size)
+}
+
+/// Render a square RGBA image with the requested pixel side length, including the quiet zone.
+pub fn rgba_with_size(
+    value: i32,
+    foreground: Option<u8>,
+    size: usize,
+) -> Result<(usize, Vec<u8>), Error> {
+    if !(MIN_IMAGE_SIZE..=MAX_IMAGE_SIZE).contains(&size) {
         return Err(Error::Image);
     }
     let cells = grid(value, foreground)?;
-    let size = 20 * cell_size;
     let mut pixels = vec![255; size * size * 4];
-    for y in 0..16 {
-        for x in 0..16 {
-            let color = PALETTE[cells[y][x] as usize];
-            for dy in 0..cell_size {
-                for dx in 0..cell_size {
-                    let offset = (((y + 2) * cell_size + dy) * size + (x + 2) * cell_size + dx) * 4;
-                    pixels[offset..offset + 3].copy_from_slice(&color);
+    // Round each cell boundary to the nearest pixel to keep the palette solid at any size.
+    let boundary = |cell| (cell * size + IMAGE_CELLS / 2) / IMAGE_CELLS;
+    for (y, row) in cells.iter().enumerate() {
+        let top = boundary(y + QUIET_ZONE_CELLS);
+        let bottom = boundary(y + QUIET_ZONE_CELLS + 1);
+        for (x, &index) in row.iter().enumerate() {
+            let [r, g, b] = PALETTE[index as usize];
+            let color = [r, g, b, 255];
+            let left = boundary(x + QUIET_ZONE_CELLS);
+            let right = boundary(x + QUIET_ZONE_CELLS + 1);
+            for y in top..bottom {
+                let row_offset = y * size;
+                let (row_pixels, _) =
+                    pixels[(row_offset + left) * 4..(row_offset + right) * 4].as_chunks_mut::<4>();
+                for pixel in row_pixels {
+                    *pixel = color;
                 }
             }
         }
