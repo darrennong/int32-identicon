@@ -25,6 +25,20 @@ pub fn encode_svg(value: i32, foreground: i32) -> Result<String, JsValue> {
 }
 
 #[wasm_bindgen]
+pub fn encode_svg_with_size(value: i32, foreground: i32, size: f64) -> Result<String, JsValue> {
+    if size.fract() != 0.0
+        || !(crate::MIN_IMAGE_SIZE as f64..=crate::MAX_IMAGE_SIZE as f64).contains(&size)
+    {
+        return Err(JsValue::from_str(&format!(
+            "image size must be an integer from {} to {} pixels",
+            crate::MIN_IMAGE_SIZE,
+            crate::MAX_IMAGE_SIZE
+        )));
+    }
+    crate::svg_with_size(value, color(foreground)?, size as usize).map_err(js_error)
+}
+
+#[wasm_bindgen]
 pub fn decode_rgba(width: u32, height: u32, pixels: &[u8]) -> Result<String, JsValue> {
     crate::scan::decode_image(width as usize, height as usize, pixels)
         .map(result_json)

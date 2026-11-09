@@ -1,7 +1,7 @@
 import {readFileSync} from 'node:fs';
 import assert from 'node:assert/strict';
 import {PNG} from 'pngjs';
-import {initSync,encode_svg,decode_rgba} from '../web/public/wasm/int32_identicon_core.js';
+import {initSync,encode_svg,encode_svg_with_size,decode_rgba} from '../web/public/wasm/int32_identicon_core.js';
 initSync({module:readFileSync(new URL('../web/public/wasm/int32_identicon_core_bg.wasm',import.meta.url))});
 const manifest=JSON.parse(readFileSync(new URL('../examples/manifest.json',import.meta.url)));
 const started=performance.now();
@@ -10,6 +10,13 @@ for(const entry of manifest.examples){
   const decoded=JSON.parse(decode_rgba(png.width,png.height,new Uint8Array(png.data)));
   assert.equal(decoded.value,entry.value);assert.equal(decoded.foreground,entry.foreground);
   assert.ok(encode_svg(entry.value,-1).startsWith('<svg'));
+}
+const defaultSvg=encode_svg(123456789,-1);
+assert.equal(encode_svg_with_size(123456789,-1,640),defaultSvg);
+assert.equal(encode_svg_with_size(123456789,-1,321),
+  defaultSvg.replace('width="640" height="640"','width="321" height="321"'));
+for(const size of [19,2561,20.5,NaN,Infinity]){
+  assert.throws(()=>encode_svg_with_size(123456789,-1,size));
 }
 assert.throws(()=>decode_rgba(32,32,new Uint8Array(32*32*4).fill(255)));
 // Use a real PNG as a small symbol inside a neutral desktop-like screen, so
